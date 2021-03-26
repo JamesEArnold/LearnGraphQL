@@ -66,6 +66,26 @@ const RootQuery = new GraphQLObjectType({
   }
 });
 
+const mutation = new GraphQLObjectType({
+  name: 'Mutation',
+  fields: {
+    // Our first mutation will be to add to our collection of users
+    addUser: {
+      // The type refers to the type of data that we will return from the resolve function
+      type: UserType,
+      // Pass in the arguments needed to create the User tyoe
+      args: {
+        firstName: { type: GraphQLString },
+        age: { type: GraphQLInt },
+        companyId: { type: GraphQLString }
+      },
+      resolve() {
+        
+      }
+    }
+  }
+})
+
 // GraphQLSchema takes in an object containing a query property
 // and returns a GraphQLSchema Instance
 export const schema = new GraphQLSchema({
