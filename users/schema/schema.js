@@ -1,21 +1,33 @@
 import graphql from "graphql";
 import axios from 'axios';
 
-const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLSchema } = graphql;
+const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLSchema, GraphQLList } = graphql;
 
 // The order of definitions/types is important
 const CompanyType = new GraphQLObjectType({
   name: 'Company',
-  fields: {
+  // We're going to wrap our fields in an arrow function
+  // to get around our UserType not being defined until after
+  // this function is called
+  fields: () => ({
     id: { type: GraphQLString },
     name: { type: GraphQLString },
-    description: { type: GraphQLString }
-  }
+    description: { type: GraphQLString },
+    users: {
+      // We need to wrap our UserType within a GraphQLList
+      // to let GraphQL know that we are expecting multiple users
+      // to be associated with this company
+      type: new GraphQLList(UserType),
+      resolve (parentValue, args) {
+        return axios.get(`http://localhost:3000/companies/${parentValue.id}/users`).then(response => response.data);
+      }
+    }
+  })
 })
 
 const UserType = new GraphQLObjectType({
   name: 'User',
-  fields: {
+  fields: () => ({
     id: { type: GraphQLString},
     firstName: { type: GraphQLString},
     age: { type: GraphQLInt},
@@ -28,7 +40,7 @@ const UserType = new GraphQLObjectType({
        return axios.get(`http://localhost:3000/companies/${parentValue.companyId}`).then(response => response.data);
       }
     }
-  }
+  })
 });
 
 const RootQuery = new GraphQLObjectType({
