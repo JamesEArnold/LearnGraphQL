@@ -1,9 +1,9 @@
 {
-    user(id: "23") {
-      id,
-      firstName,
-      age
-    }
+  user(id: "23") {
+    id,
+    firstName,
+    age
+  }
 }
 
 // We can name our queries as well and then reuse them in our codebase
