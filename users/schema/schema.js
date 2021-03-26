@@ -1,19 +1,7 @@
-import { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLSchema } from 'graphql';
-import _ from 'lodash';
+import graphql from "graphql";
+import axios from 'axios';
 
-// Hard coded list of users to use as data
-const users = [
-    { 
-        id: '23', 
-        firstName: 'Bill',
-        age: 20,
-    },
-    {
-        id: '47',
-        firstName: 'Samantha',
-        age: 21,
-    }
-]
+const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLSchema } = graphql;
 
 const UserType = new GraphQLObjectType({
     name: 'User',
@@ -32,10 +20,7 @@ const RootQuery = new GraphQLObjectType({
             // The root query has an expectation to receive an ID as an argument
             args: { id: { type: GraphQLString }},
             resolve (parentValue, args) {
-                // This go through our users
-                // And returns the first user with the matching
-                // id of the passed arg ID
-                return _.find(users, { id: args.id });
+                return axios.get(`http://localhost:3000/users/${args.id}`).then(response => response.data);
             }
         }
     }
