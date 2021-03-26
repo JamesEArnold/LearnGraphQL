@@ -1,7 +1,14 @@
 import graphql from "graphql";
 import axios from 'axios';
 
-const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLSchema, GraphQLList } = graphql;
+const { 
+    GraphQLObjectType, 
+    GraphQLString, 
+    GraphQLInt, 
+    GraphQLSchema, 
+    GraphQLList, 
+    GraphQLNonNull 
+} = graphql;
 
 // The order of definitions/types is important
 const CompanyType = new GraphQLObjectType({
@@ -73,14 +80,35 @@ const mutation = new GraphQLObjectType({
     addUser: {
       // The type refers to the type of data that we will return from the resolve function
       type: UserType,
-      // Pass in the arguments needed to create the User tyoe
+      // Pass in the arguments needed to create the User type
       args: {
-        firstName: { type: GraphQLString },
-        age: { type: GraphQLInt },
+        firstName: { type: new GraphQLNonNull(GraphQLString) },
+        age: { type: new GraphQLNonNull(GraphQLInt) },
         companyId: { type: GraphQLString }
       },
-      resolve() {
-        
+      resolve(parentValue, { firstName, age }) {
+        return axios.post(`https://localhost:3000/users`, { firstName, age }).then(response => response.data)
+      }
+    },
+    deleteUser: {
+      type: UserType,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLString) },
+      },
+      resolve(parentValue, { id }) {
+        return axios.delete(`https://localhost:3000/users/${id}`).then(response => response.data);
+      }
+    },
+    editUser: {
+      type: UserType,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLString) },
+        firstName: { type: GraphQLString },
+        age: { type: GraphQLInt },
+        company: { type: GraphQLString }
+      },
+      resolve(parentValue, args) {
+        return axios.patch(`https://localhost:3000/users/${args.id}`, args).then(response => response.data);
       }
     }
   }
@@ -90,6 +118,7 @@ const mutation = new GraphQLObjectType({
 // and returns a GraphQLSchema Instance
 export const schema = new GraphQLSchema({
   query: RootQuery,
+  mutation,
 });
 
 // We're exporting this schema to make it available to the rest
