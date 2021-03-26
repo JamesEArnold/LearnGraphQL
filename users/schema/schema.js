@@ -41,6 +41,15 @@ const RootQuery = new GraphQLObjectType({
       resolve (parentValue, args) {
           return axios.get(`http://localhost:3000/users/${args.id}`).then(response => response.data);
       }
+    },
+    // Adding this company field will allow us to search directly for company nodes
+    // instead of traversing through a User node first, to get to a company
+    company: {
+      type: CompanyType,
+      args: { id: { type: GraphQLString }},
+      resolve (parentValue, args) {
+        return axios.get(`http://localhost:3000/companies/${args.companyId}`).then(response => response.data);
+      }
     }
   }
 });
