@@ -17,3 +17,12 @@ mutation {
     id
   }
 }
+
+mutation {
+  // Here we're changing the age of this user to 10
+  editUser(id: "23", age: 10) {
+    id,
+    firstName,
+    age
+  }
+}
